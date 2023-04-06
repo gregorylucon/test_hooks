@@ -1,0 +1,1 @@
+export { Context as ContatoreContext, Provider as ContatoreContextProvider } from './ContatoreContext';
