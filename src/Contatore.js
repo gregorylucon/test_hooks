@@ -1,5 +1,5 @@
 import { Button, FormControl } from '@mui/material'
-import React, { useContext, useEffect, useState,useMemo, useCallback, useRef } from 'react'
+import React, { useContext, useEffect, useState,useMemo, useCallback, useRef , useReducer} from 'react'
 import { ContatoreContext } from './context'
 import { useNavigate } from 'react-router-dom'
 
@@ -45,7 +45,7 @@ const contReducer = (state, action) => {
  
 
 const useStatusContatore = () => {
-  
+  const [state, dispatch] = useReducer(contReducer, INITIAL_STATE)
   const {state:{contatore},incrementaNumero, decrementaNumero, naviga}=useContext(ContatoreContext)
   const [contatoredue, setContatoredue] = useState(0);
   const [numeroClick, setNumeroClick] = useState(0);
