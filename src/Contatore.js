@@ -3,13 +3,48 @@ import React, { useContext, useEffect, useState,useMemo, useCallback, useRef } f
 import { ContatoreContext } from './context'
 import { useNavigate } from 'react-router-dom'
 
+const CHANGED  = "changed"
+
+
+const INITIAL_STATE = {
+  magicValues : [2,4,6,8],
+  valuesM : [0,0,0,0],
+};
 const magicValues = [2,4,6,8];
 let valuesM = [0,0,0,0]
 
 function getValuesM(){
   return valuesM;
 }
-const Contatore = () => {
+
+const contReducer = (state, action) => {
+  switch(action.type){
+    case CHANGED: {
+      let tmp = []
+
+      for(let i = 0; i <4; i ++){
+        if(magicValues[i] === action.payload){
+          for(let j = 0; j <valuesM.length; j ++){
+            tmp.push(action.payoload);
+          }
+        }
+      }
+  
+       if (tmp.length !== 0){
+         valuesM = tmp;
+       }     
+       return {...state, magicValues};
+    }
+    default:{
+      return state
+    }
+  }
+}
+
+
+ 
+
+const useStatusContatore = () => {
   
   const {state:{contatore},incrementaNumero, decrementaNumero, naviga}=useContext(ContatoreContext)
   const [contatoredue, setContatoredue] = useState(0);
@@ -26,45 +61,41 @@ const Contatore = () => {
   );
   
   useEffect(() => {
-    setNumeroClick(numeroClick+1)
-    let tmp = []
-
-    for(let i = 0; i <4; i ++){
-      if(magicValues[i] === numeroClick){
-        for(let j = 0; j <valuesM.length; j ++){
-          tmp.push(numeroClick);
-        }
-      }
-    }
-
-     if (tmp.length != 0){
-       valuesM = tmp;
-     }
+    setNumeroClick(numeroClick+1);
+    setContatoredue(contatoredue+1)
+    dispatch({state:CHANGED, payload: numeroClick});
 
      ur.current = ur.current +1
     
-  }, [contatoredue]);
+  }, [contatore]);
 
-  //cerca il valore di numeroClick in magicValues
+
  
+  return({contatoreUno:contatore, contatoreDue:contatoredue, numClick:numeroClick, arrVals:getValuesM(), urVal:ur.current});
 
-  return (
-    <div>
-        <Button variant='contained' onClick={() => {incrementaNumero(contatore); setContatoredue(contatoredue+1);} }>Incrementa</Button>
-        <Button variant='contained' onClick={() => {decrementaNumero(contatore); setContatoredue(contatoredue-1);} }>Decrementa</Button>
-        <p>Contatore in context = {contatore}</p>
-        <p>Contatore locale = {contatoredue}</p>
-        <p>Totale click effettuati =  {numeroClick}</p>
-        <p>output memo =  {valuesMemo}</p>
-        <p>output callback =  {valuesCall}</p>
-        <p>output useref =  {ur.current}</p>
-
-
-
-        <hr/>
-        {/* <Button variant='contained' onClick={() => naviga(contatore, navigate) }>Incrementa</Button> */}
-    </div>
-  )
 }
 
+
+const Contatore = () => { 
+  const {state:{contatore},incrementaNumero, decrementaNumero, naviga}=useContext(ContatoreContext)
+
+ let status = useStatusContatore()
+   return (
+     <div>
+         <Button variant='contained' onClick={() => {incrementaNumero(contatore);} }>Incrementa</Button>
+         <Button variant='contained' onClick={() => {decrementaNumero(contatore);} }>Decrementa</Button>
+         <p>Contatore in context = {status.contatoreUno}</p>
+         <p>Contatore locale = {status.contatoreDue}</p>
+         <p>Totale click effettuati =  {status.numClick}</p>
+         <p>output memo =  {status.valuesMemo}</p>
+         {/* <p>output callback =  {valuesCall}</p> */}
+         <p>output useref =  {status.urVal}</p>
+
+
+
+         <hr/>
+         {/* <Button variant='contained' onClick={() => naviga(contatore, navigate) }>Incrementa</Button> */}
+     </div>
+   )
+}
 export default Contatore
